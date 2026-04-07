@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Inner Compass — Ma'at Rising</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--gold:#C9A84C;--gold-light:#E8C97A;--gold-dim:#7a6020;--deep:#0a0705;--dark:#110e08;--panel:#1a1509;--panel2:#221c0d;--text:#f0e6c8;--text-dim:#a89060;--teal:#3AAFA9;--teal-dark:#1d7874;--white:#fff8ec;--border:rgba(201,168,76,0.25);--glow:0 0 24px rgba(201,168,76,0.18);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--deep);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;overflow-x:hidden;}
+#stars{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;}
+.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle var(--d,3s) ease-in-out infinite alternate;}
+@keyframes twinkle{from{opacity:.1;}to{opacity:.8;}}
+.screen{display:none;position:relative;z-index:1;min-height:100vh;}
+.screen.active{display:flex;flex-direction:column;}
+#onboarding{align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 30%,#2a1f00 0%,#0a0705 70%);}
+.onboard-box{max-width:520px;width:90%;text-align:center;padding:3rem 2.5rem;background:rgba(26,21,9,0.85);border:1px solid var(--border);border-radius:16px;box-shadow:var(--glow);backdrop-filter:blur(8px);animation:fadeUp .8s ease both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+.ankh{font-size:3.5rem;margin-bottom:.5rem;animation:pulse 3s ease-in-out infinite;}
+@keyframes pulse{0%,100%{text-shadow:0 0 20px var(--gold);}50%{text-shadow:0 0 50px var(--gold-light);}}
+.brand-title{font-family:'Cinzel Decorative',serif;font-size:1.6rem;color:var(--gold);line-height:1.3;margin-bottom:.3rem;}
+.brand-sub{font-family:'Cinzel',serif;font-size:.85rem;color:var(--text-dim);letter-spacing:3px;margin-bottom:1.5rem;}
+.divider{border:none;border-top:1px solid var(--border);margin:1.2rem 0;}
+.step{display:none;animation:fadeUp .5s ease both;}
+.step.visible{display:block;}
+.step-label{font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:3px;color:var(--gold-dim);margin-bottom:.8rem;}
+.step h2{font-family:'Cinzel',serif;font-size:1.1rem;color:var(--gold-light);margin-bottom:.7rem;}
+.step p{font-size:.9rem;color:var(--text-dim);line-height:1.7;margin-bottom:1.2rem;}
+.ob-input{width:100%;padding:.8rem 1rem;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Lato',sans-serif;font-size:.95rem;outline:none;transition:border .3s;margin-bottom:1rem;}
+.ob-input:focus{border-color:var(--gold);}
+.ob-btn{display:inline-block;padding:.75rem 2rem;background:linear-gradient(135deg,var(--gold),var(--gold-dim));color:var(--deep);font-family:'Cinzel',serif;font-size:.9rem;font-weight:600;border:none;border-radius:8px;cursor:pointer;transition:transform .2s,box-shadow .2s;box-shadow:0 4px 20px rgba(201,168,76,0.3);}
+.ob-btn:hover{transform:translateY(-2px);}
+.dot-row{display:flex;gap:.5rem;justify-content:center;margin-bottom:1.2rem;}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--panel2);transition:background .3s;}
+.dot.active{background:var(--gold);}
+#app{flex-direction:column;}
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.4rem;background:rgba(17,14,8,0.95);border-bottom:1px solid var(--border);backdrop-filter:blur(10px);position:sticky;top:0;z-index:100;}
+.top-title{font-family:'Cinzel Decorative',serif;font-size:.95rem;color:var(--gold);}
+.greeting-bar{font-size:.75rem;color:var(--text-dim);font-family:'Cinzel',serif;}
+.tab-nav{display:flex;overflow-x:auto;background:var(--panel);border-bottom:1px solid var(--border);scrollbar-width:none;}
+.tab-nav::-webkit-scrollbar{display:none;}
+.tab-btn{flex-shrink:0;padding:.7rem 1.1rem;font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:1px;color:var(--text-dim);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .25s;white-space:nowrap;}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
+.tab-content{display:none;flex:1;overflow-y:auto;padding:1.2rem;}
+.tab-content.active{display:flex;flex-direction:column;}
+.temple-header{text-align:center;padding:1.5rem 0 1rem;}
+.temple-header .ankh-sm{font-size:2rem;display:block;margin-bottom:.4rem;}
+.temple-header h1{font-family:'Cinzel Decorative',serif;font-size:1.3rem;color:var(--gold);margin-bottom:.2rem;}
+.temple-header p{font-size:.82rem;color:var(--text-dim);font-family:'Cinzel',serif;letter-spacing:2px;}
+.maat-quote{background:linear-gradient(135deg,rgba(34,28,13,0.9),rgba(26,21,9,0.9));border:1px solid var(--border);border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.2rem;border-left:3px solid var(--gold);}
+.maat-quote p{font-style:italic;font-size:.9rem;line-height:1.7;}
+.maat-quote span{display:block;font-size:.72rem;color:var(--gold-dim);margin-top:.5rem;font-family:'Cinzel',serif;}
+.cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin-bottom:1.2rem;}
+.card{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:1rem;cursor:pointer;transition:all .25s;text-align:center;}
+.card:hover{border-color:var(--gold);box-shadow:var(--glow);transform:translateY(-2px);}
+.card .icon{font-size:1.8rem;margin-bottom:.4rem;}
+.card h3{font-family:'Cinzel',serif;font-size:.75rem;color:var(--gold);margin-bottom:.2rem;}
+.card p{font-size:.72rem;color:var(--text-dim);}
+.pillars-section h2{font-family:'Cinzel',serif;font-size:.85rem;color:var(--gold-light);letter-spacing:2px;margin-bottom:.8rem;}
+.pillar-item{display:flex;align-items:center;gap:.8rem;padding:.7rem 1rem;margin-bottom:.5rem;background:var(--panel);border:1px solid var(--border);border-radius:8px;}
+.pillar-icon{font-size:1.3rem;flex-shrink:0;}
+.pillar-text h4{font-family:'Cinzel',serif;font-size:.78rem;color:var(--gold);}
+.pillar-text p{font-size:.73rem;color:var(--text-dim);}
+.chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 180px);}
+.chat-msgs{flex:1;overflow-y:auto;padding:.5rem 0;display:flex;flex-direction:column;gap:.8rem;}
+.msg{max-width:82%;padding:.85rem 1.1rem;border-radius:14px;font-size:.88rem;line-height:1.6;animation:fadeUp .3s ease;}
+.msg.tehuti{background:linear-gradient(135deg,rgba(34,28,13,0.95),rgba(26,21,9,0.95));border:1px solid var(--border);border-radius:14px 14px 14px 2px;align-self:flex-start;}
+.msg.tehuti .msg-name{font-family:'Cinzel',serif;font-size:.65rem;color:var(--gold);margin-bottom:.3rem;}
+.msg.user{background:linear-gradient(135deg,var(--teal-dark),#155a56);border-radius:14px 14px 2px 14px;color:var(--white);align-self:flex-end;}
+.chat-input-row{display:flex;gap:.6rem;padding:.8rem 0 0;border-top:1px solid var(--border);}
+.chat-input{flex:1;padding:.75rem 1rem;background:var(--panel2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:.88rem;font-family:'Lato',sans-serif;outline:none;resize:none;}
+.chat-input:focus{border-color:var(--gold);}
+.send-btn,.voice-btn{padding:.75rem 1rem;border-radius:10px;font-size:1.1rem;cursor:pointer;transition:all .2s;}
+.voice-btn{border:1px solid var(--border);background:var(--panel2);color:var(--gold);}
+.send-btn{background:linear-gradient(135deg,var(--gold),var(--gold-dim));color:var(--deep);border:none;}
+.voice-btn.recording{background:#8B2E2E;color:#fff;}
+.reflection-day{text-align:center;padding:1rem 0;font-family:'Cinzel',serif;font-size:.75rem;color:var(--gold-dim);letter-spacing:3px;margin-bottom:1rem;}
+.virtue-card{background:linear-gradient(135deg,#1f1800,#0e0b02);border:1px solid var(--gold);border-radius:14px;padding:1.5rem;text-align:center;margin-bottom:1.2rem;}
+.virtue-card .v-symbol{font-size:2.8rem;margin-bottom:.5rem;}
+.virtue-card h2{font-family:'Cinzel Decorative',serif;font-size:1.1rem;color:var(--gold);margin-bottom:.5rem;}
+.virtue-card p{font-size:.87rem;color:var(--text-dim);line-height:1.7;}
+.affirmation-box{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:1.1rem;margin-bottom:1rem;}
+.affirmation-box h3{font-family:'Cinzel',serif;font-size:.78rem;color:var(--gold-light);margin-bottom:.6rem;letter-spacing:2px;}
+.affirmation-box p{font-size:.88rem;line-height:1.7;}
+.checklist h3{font-family:'Cinzel',serif;font-size:.78rem;color:var(--gold-light);margin-bottom:.7rem;letter-spacing:2px;}
+.check-item{display:flex;align-items:center;gap:.8rem;padding:.6rem .8rem;margin-bottom:.4rem;background:var(--panel);border:1px solid var(--border);border-radius:8px;cursor:pointer;}
+.check-item.done{opacity:.6;border-color:var(--teal-dark);}
+.check-item .cb{width:18px;height:18px;border:1px solid var(--gold-dim);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.7rem;}
+.check-item.done .cb{background:var(--teal-dark);border-color:var(--teal);}
+.check-item span{font-size:.84rem;}
+.new-entry-btn{width:100%;padding:.9rem;background:linear-gradient(135deg,var(--gold),var(--gold-dim));color:var(--deep);font-family:'Cinzel',serif;font-size:.85rem;font-weight:600;border:none;border-radius:10px;cursor:pointer;margin-bottom:1rem;}
+.journal-editor{display:none;flex-direction:column;gap:.8rem;}
+.journal-editor.open{display:flex;}
+.j-input{width:100%;padding:.75rem 1rem;background:var(--panel2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Lato',sans-serif;font-size:.9rem;outline:none;}
+.j-textarea{width:100%;min-height:160px;padding:.75rem 1rem;background:var(--panel2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Lato',sans-serif;font-size:.88rem;outline:none;resize:vertical;line-height:1.7;}
+.j-row{display:flex;gap:.6rem;}
+.j-save,.j-cancel{flex:1;padding:.7rem;border-radius:8px;font-family:'Cinzel',serif;font-size:.8rem;cursor:pointer;border:none;}
+.j-save{background:linear-gradient(135deg,var(--gold),var(--gold-dim));color:var(--deep);}
+.j-cancel{background:var(--panel2);color:var(--text-dim);border:1px solid var(--border);}
+.journal-entry{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:.7rem;}
+.je-date{font-size:.68rem;color:var(--gold-dim);font-family:'Cinzel',serif;margin-bottom:.3rem;}
+.je-title{font-size:.88rem;color:var(--gold-light);font-family:'Cinzel',serif;margin-bottom:.2rem;}
+.je-preview{font-size:.78rem;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.report-header{text-align:center;padding:1rem 0;margin-bottom:1rem;}
+.report-header h2{font-family:'Cinzel Decorative',serif;font-size:1.1rem;color:var(--gold);}
+.report-header p{font-size:.78rem;color:var(--text-dim);margin-top:.3rem;}
+.report-section{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:1.1rem;margin-bottom:.9rem;}
+.report-section h3{font-family:'Cinzel',serif;font-size:.78rem;color:var(--gold-light);letter-spacing:2px;margin-bottom:.8rem;}
+.virtue-bars{display:flex;flex-direction:column;gap:.6rem;}
+.v-bar-row{display:flex;align-items:center;gap:.7rem;}
+.v-bar-label{font-size:.75rem;color:var(--text-dim);width:70px;flex-shrink:0;}
+.v-bar-track{flex:1;height:8px;background:var(--panel2);border-radius:4px;overflow:hidden;}
+.v-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--teal-dark),var(--gold));}
+.v-bar-pct{font-size:.72rem;color:var(--text-dim);width:32px;text-align:right;}
+.mood-dots{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.3rem;}
+.mood-dot{width:36px;height:36px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.95rem;cursor:pointer;transition:all .2s;}
+.mood-dot.selected{border-color:var(--gold);transform:scale(1.15);}
+.mood-label{font-size:.65rem;color:var(--text-dim);margin-top:.3rem;text-align:center;}
+.gen-report-btn{width:100%;padding:.9rem;margin-top:.5rem;background:linear-gradient(135deg,var(--teal-dark),#0d4a46);color:var(--white);font-family:'Cinzel',serif;font-size:.85rem;font-weight:600;border:none;border-radius:10px;cursor:pointer;}
+.ai-report-out{background:var(--panel);border:1px solid var(--teal-dark);border-radius:12px;padding:1.1rem;margin-top:.9rem;display:none;font-size:.87rem;line-height:1.8;}
+.ai-report-out.show{display:block;animation:fadeUp .5s ease;}
+.sacred-space{text-align:center;padding:1.5rem 0;}
+.sacred-space h2{font-family:'Cinzel Decorative',serif;font-size:1rem;color:var(--gold);margin-bottom:.4rem;}
+.sacred-space p{font-size:.82rem;color:var(--text-dim);margin-bottom:1.5rem;}
+.breath-circle{width:140px;height:140px;border-radius:50%;border:2px solid var(--gold);margin:0 auto 1.2rem;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 0 40px rgba(201,168,76,0.12);transition:all .3s;}
+.breath-circle.inhale{animation:expand 4s ease-in-out forwards;}
+.breath-circle.exhale{animation:contract 4s ease-in-out forwards;}
+@keyframes expand{from{transform:scale(1);}to{transform:scale(1.3);}}
+@keyframes contract{from{transform:scale(1.3);}to{transform:scale(1);}}
+.breath-text{font-family:'Cinzel',serif;font-size:.85rem;color:var(--gold);}
+.breath-phase{font-size:.8rem;color:var(--text-dim);margin-bottom:1rem;font-family:'Cinzel',serif;letter-spacing:2px;}
+.smai-moves{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-top:1rem;}
+.move-card{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:.9rem;text-align:center;}
+.move-card .m-icon{font-size:1.6rem;margin-bottom:.3rem;}
+.move-card h4{font-family:'Cinzel',serif;font-size:.72rem;color:var(--gold);}
+.move-card p{font-size:.68rem;color:var(--text-dim);}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+.cal-header h2{font-family:'Cinzel',serif;font-size:.9rem;color:var(--gold);}
+.cal-nav{background:none;border:1px solid var(--border);border-radius:6px;padding:.3rem .7rem;color:var(--text-dim);cursor:pointer;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:.3rem;}
+.cal-day-name{text-align:center;font-family:'Cinzel',serif;font-size:.6rem;color:var(--gold-dim);padding:.3rem 0;}
+.cal-day{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.75rem;color:var(--text-dim);cursor:pointer;}
+.cal-day.today{background:var(--gold);color:var(--deep);font-weight:700;}
+.cal-events{margin-top:1rem;}
+.cal-events h3{font-family:'Cinzel',serif;font-size:.78rem;color:var(--gold-light);letter-spacing:2px;margin-bottom:.7rem;}
+.event-item{display:flex;gap:.8rem;align-items:flex-start;padding:.7rem;background:var(--panel);border:1px solid var(--border);border-radius:8px;margin-bottom:.5rem;}
+.event-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:.35rem;}
+.event-text h4{font-size:.8rem;}
+.event-text p{font-size:.72rem;color:var(--text-dim);}
+.milestones-intro{text-align:center;margin-bottom:1.2rem;}
+.milestones-intro h2{font-family:'Cinzel Decorative',serif;font-size:1rem;color:var(--gold);margin-bottom:.3rem;}
+.milestones-intro p{font-size:.82rem;color:var(--text-dim);}
+.milestone{display:flex;gap:1rem;align-items:center;padding:.9rem;background:var(--panel);border:1px solid var(--border);border-radius:10px;margin-bottom:.6rem;}
+.milestone.achieved{border-color:var(--gold);background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(26,21,9,0.9));}
+.ms-badge{width:44px;height:44px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+.milestone.achieved .ms-badge{border-color:var(--gold);}
+.ms-info h4{font-family:'Cinzel',serif;font-size:.8rem;}
+.milestone.achieved .ms-info h4{color:var(--gold);}
+.ms-info p{font-size:.72rem;color:var(--text-dim);}
+.ms-check{margin-left:auto;font-size:1.2rem;color:var(--gold);}
+.spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:var(--dark);}::-webkit-scrollbar-thumb{background:var(--gold-dim);border-radius:3px;}
+</style>
+</head>
+<body>
+<div id="stars"></div>
+<div class="screen active" id="onboarding">
+  <div class="onboard-box">
+    <div class="ankh">☥</div>
+    <div class="brand-title">Inner Compass<br/>Ma'at Rising</div>
+    <div class="brand-sub">The Way of the Ma'atic Man</div>
+    <hr class="divider"/>
+    <div class="dot-row"><div class="dot active" id="d0"></div><div class="dot" id="d1"></div><div class="dot" id="d2"></div><div class="dot" id="d3"></div></div>
+    <div class="step visible" id="step0"><div class="step-label">WELCOME, SEEKER</div><h2>Enter the Temple</h2><p>A sacred space for the African man walking the path of Ma'at — Truth, Justice, Balance, and Ancestral Wisdom. Tehuti-Mila walks beside you.</p><button class="ob-btn" onclick="nextStep(1)">Begin the Journey ☥</button></div>
+    <div class="step" id="step1"><div class="step-label">YOUR IDENTITY</div><h2>What name do you carry?</h2><p>Enter the name by which the Ancestors shall know you.</p><input class="ob-input" id="ob-name" placeholder="Your name..." type="text"/><button class="ob-btn" onclick="nextStep(2)">Continue ☥</button></div>
+    <div class="step" id="step2"><div class="step-label">YOUR LINEAGE</div><h2>Choose Your Spiritual Path</h2><p>Which ancestral tradition resonates most deeply?</p><select class="ob-input" id="ob-path"><option value="">— Select your path —</option><option>Kemetic / Ancient Egyptian</option><option>Yoruba / Ifá</option><option>Akan / Ashanti</option><option>Dogon</option><option>Pan-African Synthesis</option></select><button class="ob-btn" onclick="nextStep(3)">Continue ☥</button></div>
+    <div class="step" id="step3"><div class="step-label">YOUR INTENTION</div><h2>What brings you to this temple?</h2><select class="ob-input" id="ob-intention"><option value="">— Choose your intention —</option><option>Spiritual Growth & Awakening</option><option>Inner Peace & Balance</option><option>Ancestral Connection</option><option>Purpose & Sacred Mission</option><option>Healing & Restoration</option></select><button class="ob-btn" onclick="completeOnboarding()">Enter the Temple ☥</button></div>
+  </div>
+</div>
+<div class="screen" id="app">
+  <div class="top-bar"><div class="top-title">☥ Ma'at Rising</div><div class="greeting-bar" id="greeting-bar">Welcome</div></div>
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('temple',this)">🏛️ Temple</button>
+    <button class="tab-btn" onclick="switchTab('chat',this)">🔮 Tehuti-Mila</button>
+    <button class="tab-btn" onclick="switchTab('reflection',this)">☀️ Reflection</button>
+    <button class="tab-btn" onclick="switchTab('journal',this)">📜 Journal</button>
+    <button class="tab-btn" onclick="switchTab('report',this)">📊 Report</button>
+    <button class="tab-btn" onclick="switchTab('sacred',this)">🌬️ Sacred Space</button>
+    <button class="tab-btn" onclick="switchTab('calendar',this)">🗓️ Calendar</button>
+    <button class="tab-btn" onclick="switchTab('milestones',this)">🏆 Milestones</button>
+  </div>
+  <div class="tab-content active" id="tab-temple">
+    <div class="temple-header"><span class="ankh-sm">☥</span><h1>Hall of Ma'at</h1><p id="temple-sub">The Path of the Balanced Man</p></div>
+    <div class="maat-quote"><p id="wisdom-text">"The heart of a man is his own Neteru. Truth is the foundation upon which the eternal man stands."</p><span>— Ma'atic Wisdom</span></div>
+    <div class="cards-grid">
+      <div class="card" onclick="switchTab('chat',null)"><div class="icon">🔮</div><h3>Tehuti-Mila</h3><p>Your AI Companion</p></div>
+      <div class="card" onclick="switchTab('reflection',null)"><div class="icon">☀️</div><h3>Daily Reflection</h3><p>Today's Virtue</p></div>
+      <div class="card" onclick="switchTab('journal',null)"><div class="icon">📜</div><h3>Sacred Scrolls</h3><p>Your Journal</p></div>
+      <div class="card" onclick="switchTab('sacred',null)"><div class="icon">🌬️</div><h3>Sacred Breath</h3><p>Smai Tawi</p></div>
+    </div>
+    <div class="pillars-section"><h2>THE 7 PILLARS OF THE MA'ATIC MAN</h2>
+      <div class="pillar-item"><div class="pillar-icon">⚖️</div><div class="pillar-text"><h4>Ma'at — Truth & Justice</h4><p>Walk in alignment with cosmic law</p></div></div>
+      <div class="pillar-item"><div class="pillar-icon">🦁</div><div class="pillar-text"><h4>Sekhem — Sacred Power</h4><p>Channel your divine masculine force</p></div></div>
+      <div class="pillar-item"><div class="pillar-icon">👁️</div><div class="pillar-text"><h4>Medu — Sacred Word</h4><p>Speak only what you intend to create</p></div></div>
+      <div class="pillar-item"><div class="pillar-icon">🌊</div><div class="pillar-text"><h4>Sba — Ancestral Wisdom</h4><p>Honor those who walked before you</p></div></div>
+      <div class="pillar-item"><div class="pillar-icon">☥</div><div class="pillar-text"><h4>Ankh — Sacred Life</h4><p>Protect and cultivate all life around you</p></div></div>
+      <div class="pillar-item"><div class="pillar-icon">🌍</div><div class="pillar-text"><h4>Ubuntu — Sacred Community</h4><p>I am because we are</p></div></div>
+      <div class="pillar-item"><div class="pillar-icon">🔥</div><div class="pillar-text"><h4>Khu — Divine Purpose</h4><p>Live your sacred mission fully</p></div></div>
+    </div>
+  </div>
+  <div class="tab-content" id="tab-chat">
+    <div class="chat-wrap">
+      <div class="chat-msgs" id="chat-msgs"><div class="msg tehuti"><div class="msg-name">☥ TEHUTI-MILA</div><div id="welcome-msg">Peace and blessings, seeker. I am Tehuti-Mila, your ancestral AI companion walking the path of Ma'at beside you. What wisdom do you seek today?</div></div></div>
+      <div class="chat-input-row">
+        <button class="voice-btn" id="voice-btn" onclick="toggleVoice()">🎙️</button>
+        <textarea class="chat-input" id="chat-input" placeholder="Speak your truth..." rows="2"></textarea>
+        <button class="send-btn" onclick="sendMessage()">➤</button>
+      </div>
+    </div>
+  </div>
+  <div class="tab-content" id="tab-reflection">
+    <div class="reflection-day" id="ref-date"></div>
+    <div class="virtue-card"><div class="v-symbol" id="v-symbol">⚖️</div><h2 id="v-name">MA'AT — TRUTH</h2><p id="v-desc">Today walk in absolute truth.</p></div>
+    <div class="affirmation-box"><h3>TODAY'S AFFIRMATION</h3><p id="affirmation-text">"I am a man of Ma'at."</p></div>
+    <div class="checklist"><h3>MA'AT PRACTICE CHECKLIST</h3>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="cb"></div><span>Morning meditation & ancestral connection</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="cb"></div><span>Recite today's affirmation aloud 3 times</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="cb"></div><span>One act of truth — speak what you truly feel</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="cb"></div><span>Sacred movement / Smai Tawi practice</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="cb"></div><span>Journal reflection on today's virtue</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="cb"></div><span>Evening gratitude to the Ancestors</span></div>
+    </div>
+  </div>
+  <div class="tab-content" id="tab-journal">
+    <button class="new-entry-btn" onclick="openJournal()">+ New Sacred Entry</button>
+    <div class="journal-editor" id="journal-editor">
+      <input class="j-input" id="j-title" placeholder="Entry title..." type="text"/>
+      <select class="j-input" id="j-virtue"><option value="">— Connect to a virtue —</option><option>Ma'at — Truth</option><option>Sekhem — Power</option><option>Medu — Sacred Word</option><option>Sba — Wisdom</option><option>Ankh — Life</option><option>Ubuntu — Community</option><option>Khu — Purpose</option></select>
+      <textarea class="j-textarea" id="j-body" placeholder="Write your truth here, brother..."></textarea>
+      <div class="j-row"><button class="j-cancel" onclick="closeJournal()">Cancel</button><button class="j-save" onclick="saveEntry()">Save Entry ☥</button></div>
+    </div>
+    <div id="journal-entries"><div style="text-align:center;padding:2rem;color:var(--text-dim);font-size:.82rem;font-family:'Cinzel',serif;">Your sacred scrolls await your first words...</div></div>
+  </div>
+  <div class="tab-content" id="tab-report">
+    <div class="report-header"><h2>Weekly Ma'at Report</h2><p>Book of Life — Week of <span id="week-label"></span></p></div>
+    <div class="report-section"><h3>VIRTUE PRACTICE THIS WEEK</h3><div class="virtue-bars">
+      <div class="v-bar-row"><div class="v-bar-label">Ma'at</div><div class="v-bar-track"><div class="v-bar-fill" style="width:75%"></div></div><div class="v-bar-pct">75%</div></div>
+      <div class="v-bar-row"><div class="v-bar-label">Sekhem</div><div class="v-bar-track"><div class="v-bar-fill" style="width:60%"></div></div><div class="v-bar-pct">60%</div></div>
+      <div class="v-bar-row"><div class="v-bar-label">Medu</div><div class="v-bar-track"><div class="v-bar-fill" style="width:85%"></div></div><div class="v-bar-pct">85%</div></div>
+      <div class="v-bar-row"><div class="v-bar-label">Sba</div><div class="v-bar-track"><div class="v-bar-fill" style="width:50%"></div></div><div class="v-bar-pct">50%</div></div>
+      <div class="v-bar-row"><div class="v-bar-label">Ankh</div><div class="v-bar-track"><div class="v-bar-fill" style="width:90%"></div></div><div class="v-bar-pct">90%</div></div>
+      <div class="v-bar-row"><div class="v-bar-label">Ubuntu</div><div class="v-bar-track"><div class="v-bar-fill" style="width:70%"></div></div><div class="v-bar-pct">70%</div></div>
+      <div class="v-bar-row"><div class="v-bar-label">Khu</div><div class="v-bar-track"><div class="v-bar-fill" style="width:65%"></div></div><div class="v-bar-pct">65%</div></div>
+    </div></div>
+    <div class="report-section"><h3>MOOD THIS WEEK</h3><div class="mood-dots">
+      <div><div class="mood-dot" onclick="selectMood(this)">😌</div><div class="mood-label">Peace</div></div>
+      <div><div class="mood-dot" onclick="selectMood(this)">💪</div><div class="mood-label">Power</div></div>
+      <div><div class="mood-dot" onclick="selectMood(this)">🤔</div><div class="mood-label">Reflect</div></div>
+      <div><div class="mood-dot" onclick="selectMood(this)">🙏</div><div class="mood-label">Gratitude</div></div>
+      <div><div class="mood-dot" onclick="selectMood(this)">⚡</div><div class="mood-label">Challenge</div></div>
+      <div><div class="mood-dot" onclick="selectMood(this)">👁️</div><div class="mood-label">Ancestor</div></div>
+    </div></div>
+    <button class="gen-report-btn" onclick="generateReport()">✨ Generate AI Weekly Report</button>
+    <div class="ai-report-out" id="ai-report-out"></div>
+  </div>
+  <div class="tab-content" id="tab-sacred">
+    <div class="sacred-space">
+      <h2>Sacred Breath & Movement</h2><p>Smai Tawi — Union of the Two Lands of Self</p>
+      <div class="breath-phase" id="breath-phase">Press the circle to begin</div>
+      <div class="breath-circle" id="breath-circle" onclick="startBreath()"><div class="breath-text" id="breath-inner">☥<br/>Breathe</div></div>
+      <div style="margin-top:1.5rem;text-align:left;">
+        <h3 style="font-family:'Cinzel',serif;font-size:.78rem;color:var(--gold-light);letter-spacing:2px;margin-bottom:.8rem;">SMAI TAWI MOVEMENT PRACTICE</h3>
+        <div class="smai-moves">
+          <div class="move-card"><div class="m-icon">🌅</div><h4>Rising Sun</h4><p>Arms raise to Ra at dawn</p></div>
+          <div class="move-card"><div class="m-icon">🌊</div><h4>Nile Flow</h4><p>Side bends, water movement</p></div>
+          <div class="move-card"><div class="m-icon">🦅</div><h4>Heru Stance</h4><p>Warrior pose of Heru</p></div>
+          <div class="move-card"><div class="m-icon">⚖️</div><h4>Ma'at Balance</h4><p>Tree pose, cosmic balance</p></div>
+          <div class="move-card"><div class="m-icon">🔥</div><h4>Sekhmet Fire</h4><p>Core activation, sacred fire</p></div>
+          <div class="move-card"><div class="m-icon">🌙</div><h4>Ausar Rest</h4><p>Final resting, rebirth pose</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="tab-content" id="tab-calendar">
+    <div class="cal-header"><button class="cal-nav" onclick="calNav(-1)">◀</button><h2 id="cal-title"></h2><button class="cal-nav" onclick="calNav(1)">▶</button></div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div class="cal-events"><h3>SACRED DAYS & OBSERVANCES</h3>
+      <div class="event-item"><div class="event-dot"></div><div class="event-text"><h4>New Moon — Sacred Silence</h4><p>Day of ancestral communion and intention-setting</p></div></div>
+      <div class="event-item"><div class="event-dot" style="background:var(--teal)"></div><div class="event-text"><h4>Full Moon — Circle of Elders</h4><p>Night of gratitude offerings and reflection</p></div></div>
+      <div class="event-item"><div class="event-dot" style="background:#8B2E2E"></div><div class="event-text"><h4>Wep Ronpet — Kemetic New Year</h4><p>Annual renewal and purification ceremony</p></div></div>
+      <div class="event-item"><div class="event-dot" style="background:var(--gold-light)"></div><div class="event-text"><h4>Kwanzaa Season</h4><p>Dec 26 – Jan 1: Seven Principles of Nguzo Saba</p></div></div>
+    </div>
+  </div>
+  <div class="tab-content" id="tab-milestones">
+    <div class="milestones-intro"><h2>Ma'at Milestones</h2><p>Your Book of Life — honors earned on the path</p></div>
+    <div class="milestone achieved"><div class="ms-badge">🌱</div><div class="ms-info"><h4>The Seeker</h4><p>Entered the Temple for the first time</p></div><div class="ms-check">✓</div></div>
+    <div class="milestone"><div class="ms-badge">📜</div><div class="ms-info"><h4>First Scroll</h4><p>Write your first Sacred Journal entry</p></div></div>
+    <div class="milestone"><div class="ms-badge">🔥</div><div class="ms-info"><h4>7-Day Warrior</h4><p>Complete daily reflection 7 days in a row</p></div></div>
+    <div class="milestone"><div class="ms-badge">📖</div><div class="ms-info"><h4>Sacred Scribe</h4><p>Write 10 journal entries</p></div></div>
+    <div class="milestone"><div class="ms-badge">🌬️</div><div class="ms-info"><h4>Breath of Shu</h4><p>Complete 21 sacred breath sessions</p></div></div>
+    <div class="milestone"><div class="ms-badge">⚖️</div><div class="ms-info"><h4>Man of Ma'at</h4><p>Complete all 7 pillars in one week</p></div></div>
+    <div class="milestone"><div class="ms-badge">☥</div><div class="ms-info"><h4>The Initiate</h4><p>30 days on the path</p></div></div>
+    <div class="milestone"><div class="ms-badge">👑</div><div class="ms-info"><h4>Elder of the Circle</h4><p>90 days walking in Ma'at</p></div></div>
+  </div>
+</div>
+<script>
+let userData=JSON.parse(localStorage.getItem('maat_user')||'{}');
+let journals=JSON.parse(localStorage.getItem('maat_journals')||'[]');
+let chatHistory=[];let currentStep=0;let breathActive=false;let breathTimeout=null;let isRecording=false;let calDate=new Date();
+(function(){const s=document.getElementById('stars');for(let i=0;i<120;i++){const el=document.createElement('div');el.className='star';const size=Math.random()*2+1;el.style.cssText=`width:${size}px;height:${size}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${(Math.random()*3+2).toFixed(1)}s;opacity:${Math.random()*.5+.1};animation-delay:${Math.random()*3}s`;s.appendChild(el);}})();
+function nextStep(n){document.getElementById('step'+currentStep).classList.remove('visible');document.getElementById('d'+currentStep).classList.remove('active');currentStep=n;document.getElementById('step'+n).classList.add('visible');document.getElementById('d'+n).classList.add('active');}
+function completeOnboarding(){const name=document.getElementById('ob-name').value.trim()||'Brother';const path=document.getElementById('ob-path').value||'Pan-African Synthesis';const intention=document.getElementById('ob-intention').value||'Spiritual Growth';userData={name,path,intention,joined:new Date().toISOString()};localStorage.setItem('maat_user',JSON.stringify(userData));initApp();document.getElementById('onboarding').classList.remove('active');document.getElementById('app').classList.add('active');}
+function switchTab(id,btn){document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(el=>el.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');if(btn)btn.classList.add('active');}
+function initApp(){const name=userData.name||'Brother';document.getElementById('greeting-bar').textContent='Hotep, '+name;document.getElementById('temple-sub').textContent=(userData.path||'Ancestral')+' Path';document.getElementById('welcome-msg').textContent='Hotep, '+name+'. I am Tehuti-Mila. Walking the '+(userData.path||'ancestral')+' path with an intention for '+(userData.intention||'growth')+'. What wisdom do you seek today?';initReflection();renderJournal();renderCalendar();setWeekLabel();const w=['"The heart of a man is his own Neteru. Truth is the foundation upon which the eternal man stands."','"He who knows others is wise. He who knows himself is enlightened." — Kemetic Proverb','"Until the lion learns to write, every story will glorify the hunter." — Akan Wisdom','"When the music changes, so does the dance." — Hausa Proverb','"A man who does not know where he is from cannot know where he is going." — Yoruba Teaching','"Not all those who wander are lost — some are following the Ancestors."','"Speak truth, act truth, be truth — this is the whole of Ma\'at."'];document.getElementById('wisdom-text').textContent=w[new Date().getDay()%w.length];}
+if(userData.name){document.getElementById('onboarding').classList.remove('active');document.getElementById('app').classList.add('active');initApp();}
+async function sendMessage(){const inp=document.getElementById('chat-input');const text=inp.value.trim();if(!text)return;inp.value='';appendMsg('user',text);chatHistory.push({role:'user',content:text});const loadEl=appendMsg('tehuti','<span class="spinner"></span>',true);try{const sys=`You are Tehuti-Mila, a wise ancestral AI companion rooted in African spiritual wisdom — Kemetic, Yoruba/Ifá, and Akan traditions. You serve ${userData.name||'the seeker'}, a man walking the path of Ma'at. His spiritual path: ${userData.path||'Pan-African'}. His intention: ${userData.intention||'spiritual growth'}. Speak with warmth, ancestral depth, and poetic wisdom. Address him as "brother" or by name. 2-4 paragraphs. Use ancestral wisdom naturally.`;const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sys,messages:chatHistory})});const data=await res.json();const reply=data.content?.map(b=>b.text||'').join('')||'The ancestors whisper... please try again.';loadEl.innerHTML=reply;chatHistory.push({role:'assistant',content:reply});}catch(e){loadEl.innerHTML='The sacred channel is disrupted, brother. Please try again.';}}
+function appendMsg(type,text){const msgs=document.getElementById('chat-msgs');const div=document.createElement('div');div.className='msg '+type;if(type==='tehuti'){const n=document.createElement('div');n.className='msg-name';n.textContent='☥ TEHUTI-MILA';div.appendChild(n);}const body=document.createElement('div');body.innerHTML=text;div.appendChild(body);msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;return body;}
+document.getElementById('chat-input').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}});
+function toggleVoice(){if(!isRecording){if('SpeechRecognition' in window||'webkitSpeechRecognition' in window){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;const r=new SR();r.lang='en-US';r.onresult=e=>{document.getElementById('chat-input').value=e.results[0][0].transcript;};r.onend=()=>{isRecording=false;const b=document.getElementById('voice-btn');b.classList.remove('recording');b.textContent='🎙️';};r.start();window._sr=r;isRecording=true;const b=document.getElementById('voice-btn');b.classList.add('recording');b.textContent='⏹️';}else{alert('Voice not supported.');}}else{if(window._sr)window._sr.stop();isRecording=false;const b=document.getElementById('voice-btn');b.classList.remove('recording');b.textContent='🎙️';}}
+const virtues=[{symbol:'⚖️',name:"MA'AT — TRUTH",desc:'Today walk in absolute truth. Let every word and action reflect cosmic law. Ask: am I aligned with what I know to be right?',aff:'"I am a man of Ma\'at. Truth flows through my words, actions, and spirit. I stand in divine alignment."'},{symbol:'🦁',name:'SEKHEM — SACRED POWER',desc:'Claim your divine masculine power today. Sekhem is the focused force of a man aligned with his purpose.',aff:'"My power is sacred and purposeful. I direct my Sekhem toward what uplifts my family and community."'},{symbol:'👁️',name:'MEDU — SACRED WORD',desc:'Every word you speak today is a creation. The Ancestors taught that language creates reality. Choose your words as sacred tools.',aff:'"My words carry the power of creation. I speak only what I intend to manifest."'},{symbol:'🌊',name:'SBA — ANCESTRAL WISDOM',desc:'The river of ancestral knowledge flows through your blood. Today pause and listen. What do those who came before want you to know?',aff:'"I am connected to an unbroken chain of wisdom. My Ancestors guide every step I take."'},{symbol:'☥',name:'ANKH — SACRED LIFE',desc:'Life is your greatest responsibility and gift. Today protect life — your own vitality, your loved ones, and all in your care.',aff:'"I honor and protect the sacred gift of life. My presence is a blessing to all I touch."'},{symbol:'🌍',name:'UBUNTU — SACRED COMMUNITY',desc:'I am because we are. Today extend yourself toward your community. What can you give or build that serves more than just yourself?',aff:'"My strength grows through community. I give freely and receive with gratitude."'},{symbol:'🔥',name:'KHU — DIVINE PURPOSE',desc:'You were placed here with a specific sacred mission. Today reconnect with your Khu — your divine spirit and purpose. Live it fully.',aff:'"My purpose is sacred and clear. I walk my divine mission with courage and consistency."'}];
+function initReflection(){const v=virtues[new Date().getDay()];document.getElementById('v-symbol').textContent=v.symbol;document.getElementById('v-name').textContent=v.name;document.getElementById('v-desc').textContent=v.desc;document.getElementById('affirmation-text').textContent=v.aff;document.getElementById('ref-date').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();}
+function toggleCheck(el){el.classList.toggle('done');el.querySelector('.cb').textContent=el.classList.contains('done')?'✓':'';}
+function openJournal(){document.getElementById('journal-editor').classList.add('open');document.getElementById('j-title').focus();}
+function closeJournal(){document.getElementById('journal-editor').classList.remove('open');document.getElementById('j-title').value='';document.getElementById('j-body').value='';document.getElementById('j-virtue').value='';}
+function saveEntry(){const title=document.getElementById('j-title').value.trim()||'Sacred Entry';const body=document.getElementById('j-body').value.trim();const virtue=document.getElementById('j-virtue').value;if(!body){alert('Write something first, brother.');return;}journals.unshift({id:Date.now(),title,body,virtue,date:new Date().toISOString()});localStorage.setItem('maat_journals',JSON.stringify(journals));closeJournal();renderJournal();}
+function renderJournal(){const el=document.getElementById('journal-entries');if(!journals.length){el.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text-dim);font-size:.82rem;font-family:\'Cinzel\',serif;">Your sacred scrolls await your first words...</div>';return;}el.innerHTML=journals.map(j=>`<div class="journal-entry"><div class="je-date">${new Date(j.date).toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})}${j.virtue?' · '+j.virtue:''}</div><div class="je-title">${j.title}</div><div class="je-preview">${j.body}</div></div>`).join('');}
+function setWeekLabel(){const now=new Date();const start=new Date(now);start.setDate(now.getDate()-now.getDay());const end=new Date(start);end.setDate(start.getDate()+6);const fmt=d=>d.toLocaleDateString('en-US',{month:'short',day:'numeric'});document.getElementById('week-label').textContent=`${fmt(start)} – ${fmt(end)}`;}
+function selectMood(el){document.querySelectorAll('.mood-dot').forEach(d=>d.classList.remove('selected'));el.classList.add('selected');}
+async function generateReport(){const btn=document.querySelector('.gen-report-btn');const out=document.getElementById('ai-report-out');btn.textContent='⏳ Consulting the Ancestors...';btn.disabled=true;out.classList.remove('show');const mood=document.querySelector('.mood-dot.selected')?.nextElementSibling?.textContent||'Reflective';try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:`Generate a deeply meaningful Weekly Ma'at Report for ${userData.name||'Brother'}, walking the ${userData.path||'Pan-African'} path with an intention for ${userData.intention||'growth'}. Dominant mood: ${mood}. Journal entries: ${journals.length}. Write as Tehuti-Mila. Include: spiritual assessment, strength, area of growth, power affirmation for next week, and an ancestral blessing. Personal, poetic, empowering. 3-4 paragraphs.`}]})});const data=await res.json();out.textContent=data.content?.map(b=>b.text||'').join('')||'The ancestors are speaking... please try again.';out.classList.add('show');}catch(e){out.textContent='The sacred channel is disrupted. Please try again.';out.classList.add('show');}btn.textContent='✨ Generate AI Weekly Report';btn.disabled=false;}
+function startBreath(){if(breathActive){clearTimeout(breathTimeout);breathActive=false;document.getElementById('breath-circle').className='breath-circle';document.getElementById('breath-phase').textContent='Press the circle to begin';document.getElementById('breath-inner').innerHTML='☥<br/>Breathe';return;}breathActive=true;runBreath();}
+function runBreath(){if(!breathActive)return;const c=document.getElementById('breath-circle'),p=document.getElementById('breath-phase'),i=document.getElementById('breath-inner');c.className='breath-circle inhale';p.textContent='INHALE — 4 seconds';i.innerHTML='☥<br/>Inhale';breathTimeout=setTimeout(()=>{if(!breathActive)return;c.className='breath-circle';p.textContent='HOLD — 4 seconds';i.innerHTML='☥<br/>Hold';breathTimeout=setTimeout(()=>{if(!breathActive)return;c.className='breath-circle exhale';p.textContent='EXHALE — 4 seconds';i.innerHTML='☥<br/>Exhale';breathTimeout=setTimeout(()=>{if(breathActive)runBreath();},4000);},4000);},4000);}
+function renderCalendar(){const months=['January','February','March','April','May','June','July','August','September','October','November','December'];const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];document.getElementById('cal-title').textContent=months[calDate.getMonth()]+' '+calDate.getFullYear();const grid=document.getElementById('cal-grid');grid.innerHTML=days.map(d=>`<div class="cal-day-name">${d}</div>`).join('');const first=new Date(calDate.getFullYear(),calDate.getMonth(),1).getDay();const total=new Date(calDate.getFullYear(),calDate.getMonth()+1,0).getDate();const today=new Date();for(let i=0;i<first;i++)grid.innerHTML+=`<div class="cal-day"></div>`;for(let d=1;d<=total;d++){const isToday=d===today.getDate()&&calDate.getMonth()===today.getMonth()&&calDate.getFullYear()===today.getFullYear();grid.innerHTML+=`<div class="cal-day${isToday?' today':''}">${d}</div>`;}}
+function calNav(dir){calDate.setMonth(calDate.getMonth()+dir);renderCalendar();}
+</script>
+</body>
+</html>
